@@ -1,9 +1,10 @@
 <template>
   <div class="">
     <flow-container
-      :scene.sync="scene"
-      @mouseEnterBlock="mouseEnterBlock($event)"
-    ></flow-container>
+        :scene.sync="scene"
+        @mouseEnterBlock="mouseEnterBlock($event)"
+        :defaultBlocks="defaultBlocks"
+      ></flow-container>
   </div>
 </template>
 
@@ -20,8 +21,11 @@ export default {
   },
   data() {
     return {
+      defaultBlocks: [
+        { icon: "a", datas: { text: "这是一个数据" } },
+        { icon: "a", datas: { text: "这是一个校验" } },
+      ],
       scene: {
-        defaultBlocks: [{ icon: "", datas: {text: '这是一个数据'} }],
         blocks: [
           {
             x: 10,
@@ -212,7 +216,7 @@ export default {
         }
       }
 
-      this.scene.links = cloneDeep(this.scene.links);
+      // this.scene.links = cloneDeep(this.scene.links);
     },
     changeTest() {
       this.msg.text = { test: 1 };
@@ -240,6 +244,13 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.scene {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 100px;
+  bottom: 0;
+}
 h3 {
   margin: 40px 0 0;
 }
@@ -257,13 +268,5 @@ a {
 .hello {
   position: relative;
   height: 100%;
-}
-.flow_container {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  border: 1px solid black;
 }
 </style>

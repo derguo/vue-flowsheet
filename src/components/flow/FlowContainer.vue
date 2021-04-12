@@ -1,34 +1,42 @@
 <template>
-  <div class="flow_container">
-    <template v-for="block in blocks">
-      <flow-block
-        v-if="!(block.children && block.children.length)"
-        v-bind.sync="block"
-        :key="block.id + '1'"
-        @linkingStart="linkingStart(block, $event)"
-        @linkingStop="linkingStop(block, $event)"
-        @mouseEnterBlock="$emit('mouseEnterBlock', $event)"
-      ></flow-block>
-      <FlowBlockGroup
-        v-if="block.children && block.children.length"
-        v-bind.sync="block"
-      >
+  <div>
+    <flow-default-blocks @dragBlock="onDragstart($event)"></flow-default-blocks>
+    <div
+      class="flow_container"
+      :style="containerStyle"
+      @dragover="onDragover($event)"
+      @drop="onDrop($event)"
+      ref="container"
+    >
+      <template v-for="block in blocks">
         <flow-block
-          v-for="blockitem in block.children"
-          v-bind.sync="blockitem"
-          :key="blockitem.id"
-          @linkingStart="linkingStart(blockitem, $event)"
-          @linkingStop="linkingStop(blockitem, $event)"
+          v-if="!(block.children && block.children.length)"
+          v-bind.sync="block"
+          :key="block.id + '1'"
+          @linkingStart="linkingStart(block, $event)"
+          @linkingStop="linkingStop(block, $event)"
           @mouseEnterBlock="$emit('mouseEnterBlock', $event)"
         ></flow-block>
-      </FlowBlockGroup>
-    </template>
-
-    <FlowLink
-      :lines="lines"
-      :outline="true"
-      @chooseLine="linkChoosed($event)"
-    />
+        <FlowBlockGroup
+          v-if="block.children && block.children.length"
+          v-bind.sync="block"
+        >
+          <flow-block
+            v-for="blockitem in block.children"
+            v-bind.sync="blockitem"
+            :key="blockitem.id"
+            @linkingStart="linkingStart(blockitem, $event)"
+            @linkingStop="linkingStop(blockitem, $event)"
+            @mouseEnterBlock="$emit('mouseEnterBlock', $event)"
+          ></flow-block>
+        </FlowBlockGroup>
+      </template>
+      <FlowLink
+        :lines="lines"
+        :outline="true"
+        @chooseLine="linkChoosed($event)"
+      />
+    </div>
   </div>
 </template>
 
@@ -38,10 +46,11 @@ import FlowBlock from "./FlowBlock";
 import FlowBlockGroup from "./FlowBlockGroup";
 import FlowLink from "./FlowLink";
 import mouseHelper from "./helpers/mouse";
+import FlowDefaultBlocks from "./FlowDefaultBlocks";
 
 export default {
   name: "FlowContainer",
-  components: { FlowBlock, FlowBlockGroup, FlowLink },
+  components: { FlowBlock, FlowBlockGroup, FlowLink, FlowDefaultBlocks },
   props: {
     scene: {
       type: Object,
@@ -49,6 +58,17 @@ export default {
         return { blocks: [], links: [], container: {} };
       },
     },
+    defaultBlocks: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+  },
+  provide() {
+    return {
+      defaultBlocksOptions: this.defaultBlocks,
+    };
   },
   data() {
     return {
@@ -62,6 +82,7 @@ export default {
       lastMouseY: 0,
       scale: 1,
       chooseLine: null,
+      chooseDefaultBlock: null,
     };
   },
   created() {
@@ -89,8 +110,8 @@ export default {
       true
     );
 
-    // this.centerX = this.$el.clientWidth / 2;
-    // this.centerY = this.$el.clientHeight / 2;
+    // this.centerX = this.$refs.container.clientWidth / 2;
+    // this.centerY = this.$refs.container.clientHeight / 2;
 
     // this.importBlocksContent();
     // this.importScene();
@@ -119,7 +140,7 @@ export default {
   },
   methods: {
     handleMove(e) {
-      let mouse = mouseHelper.getMousePosition(this.$el, e);
+      let mouse = mouseHelper.getMousePosition(this.$refs.container, e);
       this.mouseX = mouse.x;
       this.mouseY = mouse.y;
 
@@ -152,12 +173,12 @@ export default {
     handleDown(e) {
       const target = e.target || e.srcElement;
       if (
-        (target === this.$el || target.matches("svg, svg *")) &&
+        (target === this.$refs.container || target.matches("svg, svg *")) &&
         e.which === 1
       ) {
         this.dragging = true;
 
-        let mouse = mouseHelper.getMousePosition(this.$el, e);
+        let mouse = mouseHelper.getMousePosition(this.$refs.container, e);
         this.mouseX = mouse.x;
         this.mouseY = mouse.y;
 
@@ -179,7 +200,7 @@ export default {
         }
       }
 
-      if (this.$el.contains(target) && !(target.className === "linkEnd")) {
+      if (this.$refs.container.contains(target) && !(target.className === "linkEnd")) {
         this.linking = false;
         this.tempLink = null;
         this.linkStartData = null;
@@ -187,7 +208,7 @@ export default {
     },
     handleWheel(e) {
       // const target = e.target || e.srcElement;
-      // if (this.$el.contains(target)) {
+      // if (this.$refs.container.contains(target)) {
       //   if (e.preventDefault) e.preventDefault();
       //   let deltaScale = Math.pow(1.1, e.deltaY * -0.01);
       //   this.scale *= deltaScale;
@@ -312,6 +333,40 @@ export default {
       }
       return r;
     },
+
+    findMaxId(bs) {
+      let max = undefined;
+      for (let item of bs) {
+        if (item.children && item.children.length) {
+          max = this.findMaxId(item.children)
+        }else if (max === undefined || max < item.id) {
+          max = item.id;
+        }       
+      }
+      return max;
+    },
+
+    onDragstart(data) {
+      this.chooseDefaultBlock = data;
+    },
+    onDragover(e) {
+      if (e.preventDefault) e.preventDefault();
+    },
+    onDrop(e) {
+      let mouse = mouseHelper.getMousePosition(this.$refs.container, e);
+
+      this.chooseDefaultBlock.x = mouse.x - this.chooseDefaultBlock.x;
+      this.chooseDefaultBlock.y = mouse.y - this.chooseDefaultBlock.y;
+      this.chooseDefaultBlock.width = 120;
+      this.chooseDefaultBlock.height = 20;
+
+      this.chooseDefaultBlock.id = this.findMaxId(this.blocks) + 1;
+
+      this.blocks.push(this.chooseDefaultBlock);
+
+      this.$emit("update:scene", this.exportScene());
+      // this.$emit('addBlock', this.chooseDefaultBlock);
+    },
   },
   computed: {
     lines() {
@@ -357,13 +412,26 @@ export default {
         return val.children && val.children.length;
       });
     },
+    containerStyle() {
+      return !this.defaultBlocks.length
+        ? {}
+        : {
+            left: "120px",
+          };
+    },
   },
   watch: {
     "scene.links": {
       handler(val) {
         this.links = cloneDeep(val);
       },
-      deep: false,
+      deep: true,
+    },
+    "scene.blocks": {
+      handler(val) {
+        this.blocks = cloneDeep(val);
+      },
+      deep: true,
     },
   },
 };
@@ -374,5 +442,13 @@ export default {
   position: relative;
   overflow: hidden;
   background-color: #eee;
+}
+.flow_container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border: 1px solid black;
 }
 </style>

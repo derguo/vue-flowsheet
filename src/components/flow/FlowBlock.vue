@@ -5,12 +5,15 @@
     @mouseenter="mouseEnter($event)"
     @mouseleave="mouseLeave($event)"
   >
+    <div class="blockIcon" v-if="icon"></div>
+    <div class="blockText" :title="datas.text || '未命名'">
+      {{ datas.text || "未命名" }}
+    </div>
     <div
       class="linkEnd"
       @mouseup="slotMouseUp($event, 0)"
       @mousedown="slotBreak($event)"
     ></div>
-    <div class="blockText" :title="datas.text">{{ datas.text }}</div>
     <div class="linkStart" @mousedown="slotMouseDown($event, 1)"></div>
     <div
       class="blockCloseButton"
@@ -67,6 +70,10 @@ export default {
       default: function () {
         return { text: "新建模块" };
       },
+    },
+    icon: {
+      type: String,
+      default: "",
     },
   },
   data() {
@@ -281,5 +288,9 @@ export default {
   cursor: pointer;
   right: -5px;
   top: -5px;
+}
+.blockIcon {
+  width: 120px;
+  height: 120px;
 }
 </style>
