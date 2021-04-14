@@ -58,6 +58,9 @@ export default {
         return "#000";
       },
     },
+    options: {
+      type: Object,
+    },
   },
   created() {
     this.mouseX = 0;
@@ -143,8 +146,8 @@ export default {
       }
     },
     moveWithDiff(diffX, diffY) {
-      let left = this.x + diffX; // / this.options.scale;
-      let top = this.y + diffY; // / this.options.scale;
+      let left = this.x + diffX / this.options.scale;
+      let top = this.y + diffY / this.options.scale;
 
       this.$emit("update:x", left);
       this.$emit("update:y", top);
@@ -168,9 +171,11 @@ export default {
   computed: {
     style() {
       return {
-        top: this.y + "px",
-        left: this.x + "px",
+        top: this.options.center.y + this.y * this.options.scale + "px",
+        left: this.options.center.x + this.x * this.options.scale + "px",
         border: "1px solid" + this.themeColor,
+        transform: "scale(" + (this.options.scale + "") + ")",
+        transformOrigin: "top left",
       };
     },
   },
@@ -206,5 +211,6 @@ export default {
   cursor: pointer;
   right: -5px;
   top: -5px;
+  text-align: center;
 }
 </style>

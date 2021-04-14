@@ -13,13 +13,18 @@
           v-if="!(block.children && block.children.length)"
           v-bind.sync="block"
           :key="block.id + '1'"
+          :options="optionsForChild"
           @linkingStart="linkingStart(block, $event)"
           @linkingStop="linkingStop(block, $event)"
           @mouseEnterBlock="$emit('mouseEnterBlock', $event)"
+          @mouseLeaveBlock="$emit('mouseLeaveBlock', $event)"
+          @dblclickBlock="$emit('dblclickBlock', $event)"
+          @close="deleteBlock($event)"
         ></flow-block>
         <FlowBlockGroup
           v-if="block.children && block.children.length"
           v-bind.sync="block"
+          :options="optionsForChild"
         >
           <flow-block
             v-for="blockitem in block.children"
@@ -28,6 +33,9 @@
             @linkingStart="linkingStart(blockitem, $event)"
             @linkingStop="linkingStop(blockitem, $event)"
             @mouseEnterBlock="$emit('mouseEnterBlock', $event)"
+            @dblclickBlock="$emit('dblclickBlock', $event)"
+            @mouseLeaveBlock="$emit('mouseLeaveBlock', $event)"
+            @close="deleteBlock($event)"
           ></flow-block>
         </FlowBlockGroup>
       </template>
@@ -81,14 +89,28 @@ export default {
       lastMouseX: 0,
       lastMouseY: 0,
       scale: 1,
+      centerY: 0,
+      centerX: 0,
       chooseLine: null,
       chooseDefaultBlock: null,
+      minScale: 0.2,
+      maxScale: 5,
     };
   },
   created() {
     this.blocks = cloneDeep(this.scene.blocks);
     this.links = cloneDeep(this.scene.links);
     this.container = cloneDeep(this.scene.container);
+    let container = this.container;
+    if (container.centerX) {
+      this.centerX = container.centerX;
+    }
+    if (container.centerY) {
+      this.centerY = container.centerY;
+    }
+    if (container.scale) {
+      this.scale = container.scale;
+    }
   },
   mounted() {
     document.documentElement.addEventListener(
@@ -115,6 +137,7 @@ export default {
 
     // this.importBlocksContent();
     // this.importScene();
+    this.updateScene();
   },
   beforeDestroy() {
     document.documentElement.removeEventListener(
@@ -176,6 +199,7 @@ export default {
         (target === this.$refs.container || target.matches("svg, svg *")) &&
         e.which === 1
       ) {
+        console.log("tuodong");
         this.dragging = true;
 
         let mouse = mouseHelper.getMousePosition(this.$refs.container, e);
@@ -200,35 +224,38 @@ export default {
         }
       }
 
-      if (this.$refs.container.contains(target) && !(target.className === "linkEnd")) {
+      if (
+        this.$refs.container.contains(target) &&
+        !(target.className === "linkEnd")
+      ) {
         this.linking = false;
         this.tempLink = null;
         this.linkStartData = null;
       }
     },
     handleWheel(e) {
-      // const target = e.target || e.srcElement;
-      // if (this.$refs.container.contains(target)) {
-      //   if (e.preventDefault) e.preventDefault();
-      //   let deltaScale = Math.pow(1.1, e.deltaY * -0.01);
-      //   this.scale *= deltaScale;
-      //   if (this.scale < this.minScale) {
-      //     this.scale = this.minScale;
-      //     return;
-      //   } else if (this.scale > this.maxScale) {
-      //     this.scale = this.maxScale;
-      //     return;
-      //   }
-      //   let zoomingCenter = {
-      //     x: this.mouseX,
-      //     y: this.mouseY,
-      //   };
-      //   let deltaOffsetX = (zoomingCenter.x - this.centerX) * (deltaScale - 1);
-      //   let deltaOffsetY = (zoomingCenter.y - this.centerY) * (deltaScale - 1);
-      //   this.centerX -= deltaOffsetX;
-      //   this.centerY -= deltaOffsetY;
-      //   this.updateScene();
-      // }
+      const target = e.target || e.srcElement;
+      if (this.$refs.container.contains(target)) {
+        if (e.preventDefault) e.preventDefault();
+        let deltaScale = Math.pow(1.1, e.deltaY * -0.01);
+        this.scale *= deltaScale;
+        if (this.scale < this.minScale) {
+          this.scale = this.minScale;
+          return;
+        } else if (this.scale > this.maxScale) {
+          this.scale = this.maxScale;
+          return;
+        }
+        let zoomingCenter = {
+          x: this.mouseX,
+          y: this.mouseY,
+        };
+        let deltaOffsetX = (zoomingCenter.x - this.centerX) * (deltaScale - 1);
+        let deltaOffsetY = (zoomingCenter.y - this.centerY) * (deltaScale - 1);
+        this.centerX -= deltaOffsetX;
+        this.centerY -= deltaOffsetY;
+        this.updateScene();
+      }
     },
     handleKeyboard(event) {
       var e = event || window.event || arguments.callee.caller.arguments[0];
@@ -263,6 +290,11 @@ export default {
           dot = { x: block.x + block.width / 2, y: block.y + block.height };
           break;
       }
+      dot.x *= this.scale;
+      dot.y *= this.scale;
+
+      dot.x += this.centerX;
+      dot.y += this.centerY;
       return dot; //{ x: block.x + block.width, y: block.y + block.height / 2 };
     },
 
@@ -293,7 +325,7 @@ export default {
           this.links.push({
             start: this.linkStartData.block.id,
             end: targetBlock.id,
-            themeColor: "#F85",
+            themeColor: "#555",
           });
           this.updateScene();
         }
@@ -322,12 +354,12 @@ export default {
       let r = null;
       for (let item of bs) {
         if (item.children && item.children.length) {
-          r = this.findBlockById(item.children, blockId);
-          if (r) {
+          if (this.findBlockById(item.children, blockId)) {
+            r = this.findBlockById(item.children, blockId);
             break;
           }
         } else if (item.id == blockId) {
-          r = item;
+          r = { block: item, parent: bs };
           break;
         }
       }
@@ -338,10 +370,10 @@ export default {
       let max = undefined;
       for (let item of bs) {
         if (item.children && item.children.length) {
-          max = this.findMaxId(item.children)
-        }else if (max === undefined || max < item.id) {
+          max = this.findMaxId(item.children);
+        } else if (max === undefined || max < item.id) {
           max = item.id;
-        }       
+        }
       }
       return max;
     },
@@ -365,15 +397,30 @@ export default {
       this.blocks.push(this.chooseDefaultBlock);
 
       this.$emit("update:scene", this.exportScene());
-      // this.$emit('addBlock', this.chooseDefaultBlock);
+      console.log(this.links, this.blocks);
+    },
+
+    deleteBlock(id) {
+      let b = this.findBlockById(this.blocks, id);
+      let i = b.parent.indexOf(b.block);
+      if (i >= 0) {
+        b.parent.splice(i, 1);
+
+        this.links = this.links.filter((link) => {
+          return !(link.start === id || link.end === id);
+        });
+        this.$nextTick(() => {
+          this.updateScene();
+        });
+      }
     },
   },
   computed: {
     lines() {
       let lines = [
         ...this.links.map((val) => {
-          let startBlock = this.findBlockById(this.blocks, val.start);
-          let endBlock = this.findBlockById(this.blocks, val.end);
+          let startBlock = this.findBlockById(this.blocks, val.start).block;
+          let endBlock = this.findBlockById(this.blocks, val.end).block;
           let startDot = null;
           let endDot = null;
           if (startBlock && endBlock) {
@@ -389,7 +436,7 @@ export default {
             end: val.end,
             style: {
               stroke: val.themeColor || "#666",
-              strokeWidth: 1 * this.scale,
+              strokeWidth: 2 * this.scale,
               fill: "none",
             },
           };
@@ -418,6 +465,15 @@ export default {
         : {
             left: "120px",
           };
+    },
+    optionsForChild() {
+      return {
+        scale: this.scale,
+        center: {
+          x: this.centerX,
+          y: this.centerY,
+        },
+      };
     },
   },
   watch: {

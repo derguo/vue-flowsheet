@@ -1,19 +1,26 @@
 <template>
   <div id="app">
-    <HelloWorld :msg="msg" />
+    <HelloWorld :msg="msg">
+      <div>aa</div>
+      <div>bbb</div>
+      <component :is="aaa"></component>
+      <test />
+    </HelloWorld>
   </div>
 </template>
 
 <script>
 import HelloWorld from "./components/HelloWorld.vue";
+import Test from "./components/test.vue";
 
 export default {
   name: "app",
   components: {
-    HelloWorld,
+    HelloWorld
   },
   data() {
     return {
+      aaa: Test,
       msg: {
         text: "Welcome to Your Vue.js App",
         data: [{ color: "red" }, 1, 1, 1, 1],

@@ -1,10 +1,10 @@
 <template>
   <div class="">
     <flow-container
-        :scene.sync="scene"
-        @mouseEnterBlock="mouseEnterBlock($event)"
-        :defaultBlocks="defaultBlocks"
-      ></flow-container>
+      :scene.sync="scene"
+      @mouseEnterBlock="mouseEnterBlock($event)"
+      :defaultBlocks="defaultBlocks"
+    ></flow-container>
   </div>
 </template>
 
@@ -18,6 +18,9 @@ export default {
   },
   components: {
     FlowContainer,
+  },
+  mounted() {
+    console.log(this.$slots);
   },
   data() {
     return {
@@ -203,7 +206,11 @@ export default {
             themeColor: "#F85",
           },
         ],
-        container: {},
+        container: {
+          centerX: 0,
+          centerY: 0,
+          scale: 1,
+        },
       },
     };
   },

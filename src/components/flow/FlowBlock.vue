@@ -4,8 +4,12 @@
     :style="style"
     @mouseenter="mouseEnter($event)"
     @mouseleave="mouseLeave($event)"
+    @dblclick="dblclick($event)"
   >
-    <div class="blockIcon" v-if="icon"></div>
+    <div class="blockIcon" v-if="icon || (!inGroup && icon)">
+      <div class="iconMask"></div>
+      <icon-svg :name="icon" style="height: 100%; width: 100%"></icon-svg>
+    </div>
     <div class="blockText" :title="datas.text || '未命名'">
       {{ datas.text || "未命名" }}
     </div>
@@ -75,11 +79,19 @@ export default {
       type: String,
       default: "",
     },
+    options: {
+      type: Object,
+    },
+    bgColer: {
+      type: String,
+      default: "#eee",
+    },
   },
   data() {
     return {
       blockCloseButtonShow: false,
       hasDragged: false,
+      tempBgColor: false,
     };
   },
   created() {
@@ -141,15 +153,23 @@ export default {
             width: this.width + "px",
             lineHeight: this.height + "px",
             cursor: "default",
+            backgroundColor: this.backColor,
           }
         : {
-            top: this.y + "px",
-            left: this.x + "px",
-            height: this.height + "px",
+            top: this.options.center.y + this.y * this.options.scale + "px",
+            left: this.options.center.x + this.x * this.options.scale + "px",
+            height: this.icon ? this.height + 100 : this.height + "px",
             width: this.width + "px",
             lineHeight: this.height + "px",
+            border: "1px solid #ddd",
+            transform: "scale(" + (this.options.scale + "") + ")",
+            transformOrigin: "top left",
+            backgroundColor: this.backColor,
           };
     },
+    backColor() {
+        return this.tempBgColor ? '#afb4db' : this.bgColer
+    }
   },
   methods: {
     handleMove(e) {
@@ -199,8 +219,8 @@ export default {
       }
     },
     moveWithDiff(diffX, diffY) {
-      let left = this.x + diffX; // / this.options.scale;
-      let top = this.y + diffY; // / this.options.scale;
+      let left = this.x + diffX / this.options.scale;
+      let top = this.y + diffY / this.options.scale;
 
       this.$emit("update:x", left);
       this.$emit("update:y", top);
@@ -228,15 +248,24 @@ export default {
 
     closeBlock(e) {
       this.$emit("close", this.id);
+      if(this.inGroup) {
+        this.$parent.changeChildrenDot()
+      }
       if (e.preventDefault) e.preventDefault();
     },
 
     mouseEnter() {
       this.blockCloseButtonShow = true;
+      this.tempBgColor = true;
       this.$emit("mouseEnterBlock", this.id);
     },
     mouseLeave() {
       this.blockCloseButtonShow = false;
+      this.tempBgColor = false;
+      this.$emit("mouseLeaveBlock", this.id);
+    },
+    dblclick() {
+      this.$emit("dblclickBlock", this.id);
     },
   },
 };
@@ -245,7 +274,7 @@ export default {
 .flow-block {
   position: absolute;
   padding: 0px 7px;
-  background-color: white;
+  /* background-color: white; */
 }
 .flow-block:hover {
   cursor: move;
@@ -280,6 +309,7 @@ export default {
   position: absolute;
   width: 10px;
   height: 10px;
+  text-align: center;
   border-radius: 5px;
   background-color: red;
   color: white;
@@ -290,7 +320,14 @@ export default {
   top: -5px;
 }
 .blockIcon {
-  width: 120px;
-  height: 120px;
+  position: relative;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+}
+.iconMask{
+  position:absolute;
+  width: 100%;
+  height: 100%;
 }
 </style>
