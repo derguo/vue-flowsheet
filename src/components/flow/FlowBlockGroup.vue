@@ -224,7 +224,7 @@ export default {
     font-size: 12px;
     border-bottom: 1px rgb(100, 100, 100) solid;
     background-color: rgb(100, 100, 100);
-    max-width: 120px;
+    /* max-width: 120px; */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
