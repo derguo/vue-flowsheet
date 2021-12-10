@@ -1,16 +1,82 @@
 <template>
-  <div class="">
-    <flow-container
+  <div
+    class=""
+    style="background-color: rgb(245, 247, 249); padding-bottom: 22px"
+  >
+    <button @click="printflow">print</button>
+    <!-- <flow-container
+      ref="flow"
+      id="flow"
       :scene.sync="scene"
       @mouseEnterBlock="mouseEnterBlock($event)"
       :defaultBlocks="defaultBlocks"
-    ></flow-container>
+    ></flow-container> -->
+    <svg-paper ref="table" :size="'a4'">
+      <svg-table>
+        <!-- <svg-thead>
+          <svg-th>
+            我 先往上去，然后往下去，然后再往上去，漂亮吧！我aaaaaa dddddd
+            eeeeeee sdf asd fa sdf
+            先往上去，然后往下去，然后再往上去，漂亮吧！我先往上去，然后往下去，然后再往上去，漂亮吧！我先往上去，然后往下去，然后再往上去，漂亮吧！
+            我 先往上去，然后往下去，然后再往上去，漂亮吧！我aaaaaa dddddd
+            eeeeeee sdf asd fa sdf
+            先往上去，然后往下去，然后再往上去，漂亮吧！我先往上去，然后往下去，然后再往上去，漂亮吧！我先往上去，然后往下去，然后再往上去，漂亮吧！
+          </svg-th>
+        </svg-thead> -->
+        <svg-tr
+          v-for="(data, index) in [
+            ...wsdata,
+            ...wsdata,
+            ...wsdata,
+            ...wsdata,
+            ...wsdata,
+            ...wsdata,
+            ...wsdata,
+            ...wsdata,
+          ]"
+          :key="index"
+        >
+          <svg-td>
+            vue组件递归
+            刚才写了篇《element多层导航菜单》文章,顺便也写写其中核心原理
+            其实没啥好说就是组件递归,这里呢简单写个例子,
+            面试被问到的时候直接拿来手写代
+          </svg-td>
+          <svg-td>
+            它不会报错,这个应该是被vue优化了。
+            思想:递归调用某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
+          </svg-td>
+          <svg-td>
+            它不会报错,这个应该是被vue优化了。
+            思想:递归调用某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
+          </svg-td>
+          <svg-td>
+            该是被vue优化了。
+            思想:递归调用某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
+          </svg-td>
+          <svg-td>
+            ue优化了。
+            思想:递归调用某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
+          </svg-td>
+          <svg-td>
+            某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
+          </svg-td>
+          <svg-td> 数据的格式就有技巧: </svg-td>
+        </svg-tr>
+      </svg-table>
+    </svg-paper>
   </div>
 </template>
 
 <script>
 import FlowContainer from "./flow/FlowContainer";
 import cloneDeep from "lodash/cloneDeep";
+import svgTable from "./svgtable/svgTable";
+import SvgTr from "./svgtable/svgTr";
+import svgThead from "./svgtable/svgThead";
+import svgTh from "./svgtable/svgTh";
+import svgTd from "./svgtable/svgTd";
+import svgPaper from "./svgPaper/svgPaper";
 export default {
   name: "HelloWorld",
   props: {
@@ -18,6 +84,12 @@ export default {
   },
   components: {
     FlowContainer,
+    svgTable,
+    SvgTr,
+    svgThead,
+    svgTh,
+    svgTd,
+    svgPaper,
   },
   mounted() {
     console.log(this.$slots);
@@ -212,6 +284,256 @@ export default {
           scale: 1,
         },
       },
+      wsdata: [
+        {
+          czid: "10001",
+          data: [
+            {
+              info: "2021-12-01 09:46",
+              fzid: "",
+              tsys: "1",
+              index: 1,
+            },
+            {
+              info: "第一条数据",
+              fzid: "1",
+              tsys: "1",
+              index: 2,
+            },
+            {
+              info: "11",
+              fzid: "1",
+              tsys: "1",
+              index: 3,
+            },
+            {
+              info: "11",
+              fzid: "1",
+              tsys: "1",
+              index: 4,
+            },
+            {
+              info: "患者男性大段文字省略.......",
+              fzid: "2",
+              tsys: "1",
+              index: 9,
+            },
+            {
+              info: "管XX",
+              fzid: "3",
+              tsys: "1",
+              index: 10,
+            },
+          ],
+        },
+        {
+          czid: "10001",
+          data: [
+            {
+              info: "第二条数据",
+              fzid: "1",
+              tsys: "1",
+              index: 2,
+            },
+            {
+              info: "22",
+              fzid: "1",
+              tsys: "1",
+              index: 3,
+            },
+            {
+              info: "22",
+              fzid: "1",
+              tsys: "1",
+              index: 4,
+            },
+          ],
+        },
+        {
+          czid: "10001",
+          data: [
+            {
+              info: "第三条数据",
+              fzid: "1",
+              tsys: "1",
+              index: 2,
+            },
+            {
+              info: "33",
+              fzid: "1",
+              tsys: "1",
+              index: 3,
+            },
+            {
+              info: "33",
+              fzid: "1",
+              tsys: "1",
+              index: 4,
+            },
+          ],
+        },
+        {
+          czid: "10002",
+          data: [
+            {
+              info: "2021-12-01 09:46",
+              fzid: "",
+              tsys: "1",
+              index: 1,
+            },
+            {
+              info: "第四条数据",
+              fzid: "1",
+              tsys: "1",
+              index: 2,
+            },
+            {
+              info: "44",
+              fzid: "1",
+              tsys: "1",
+              index: 3,
+            },
+            {
+              info: "44",
+              fzid: "1",
+              tsys: "1",
+              index: 4,
+            },
+            {
+              info: "管理员",
+              fzid: "2",
+              tsys: "1",
+              index: 10,
+            },
+          ],
+        },
+      ],
+      wstitle: [
+        {
+          info: "时间",
+          width: 100,
+          height: 70,
+          son: [],
+        },
+        {
+          info: "普通评估",
+          width: 300,
+          height: 30,
+          son: [
+            {
+              info: "普通工具",
+              width: 30,
+              height: 40,
+              son: [],
+            },
+            {
+              info: "疼痛评分",
+              width: 30,
+              height: 40,
+              son: [],
+            },
+            {
+              info: "疼痛性质",
+              width: 30,
+              height: 40,
+              son: [],
+            },
+            {
+              info: "疼痛部位",
+              width: 80,
+              height: 40,
+              son: [],
+            },
+            {
+              info: "疼痛频率(24H)",
+              width: 45,
+              height: 40,
+              son: [],
+            },
+            {
+              info: "持续痛",
+              width: 35,
+              height: 40,
+              son: [],
+            },
+            {
+              info: "间歇痛",
+              width: 35,
+              height: 40,
+              son: [],
+            },
+          ],
+        },
+        {
+          info: "简明麦吉尔疼痛问卷",
+          width: 90,
+          height: 30,
+          son: [
+            {
+              info: "总分PRI(A+B)+PPI",
+              width: 90,
+              height: 40,
+              son: [],
+            },
+          ],
+        },
+        {
+          info: "用药",
+          width: 210,
+          height: 30,
+          son: [
+            {
+              info: "时间",
+              width: 60,
+              height: 40,
+              son: [],
+            },
+            {
+              info: "药物/剂量",
+              width: 110,
+              height: 40,
+              son: [],
+            },
+            {
+              info: "途径",
+              width: 40,
+              height: 40,
+              son: [],
+            },
+          ],
+        },
+        {
+          info: "护理处理措施",
+          width: 40,
+          height: 70,
+          son: [],
+        },
+        {
+          info: "效果评价",
+          width: 90,
+          height: 30,
+          son: [
+            {
+              info: "评价时间",
+              width: 60,
+              height: 40,
+              son: [],
+            },
+            {
+              info: "疼痛评分",
+              width: 30,
+              height: 40,
+              son: [],
+            },
+          ],
+        },
+        {
+          info: "签名",
+          width: 35,
+          height: 70,
+          son: [],
+        },
+      ],
     };
   },
   methods: {
@@ -227,6 +549,15 @@ export default {
     },
     changeTest() {
       this.msg.text = { test: 1 };
+    },
+    printflow() {
+      // var strHTML = document.getElementsByTagName("html")[0].innerHTML;
+      // var strHTML = this.$refs.flow._self.$el.innerHTML;
+      var strHTML = this.$refs.table.$el.innerHTML;
+      console.log(this.$refs.table, strHTML);
+
+      LODOP.ADD_PRINT_HTM(0, 0, "100%", "100%", strHTML);
+      LODOP.PREVIEW();
     },
   },
   watch: {
