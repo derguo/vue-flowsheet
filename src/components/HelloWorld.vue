@@ -11,58 +11,28 @@
       @mouseEnterBlock="mouseEnterBlock($event)"
       :defaultBlocks="defaultBlocks"
     ></flow-container> -->
-    <svg-paper ref="table" :size="'a4'">
+    <svg-paper ref="table" :size="'a4h'">
       <svg-table>
-        <!-- <svg-thead>
-          <svg-th>
-            我 先往上去，然后往下去，然后再往上去，漂亮吧！我aaaaaa dddddd
-            eeeeeee sdf asd fa sdf
-            先往上去，然后往下去，然后再往上去，漂亮吧！我先往上去，然后往下去，然后再往上去，漂亮吧！我先往上去，然后往下去，然后再往上去，漂亮吧！
-            我 先往上去，然后往下去，然后再往上去，漂亮吧！我aaaaaa dddddd
-            eeeeeee sdf asd fa sdf
-            先往上去，然后往下去，然后再往上去，漂亮吧！我先往上去，然后往下去，然后再往上去，漂亮吧！我先往上去，然后往下去，然后再往上去，漂亮吧！
-          </svg-th>
-        </svg-thead> -->
-        <svg-tr
-          v-for="(data, index) in [
-            ...wsdata,
-            ...wsdata,
-            ...wsdata,
-            ...wsdata,
-            ...wsdata,
-            ...wsdata,
-            ...wsdata,
-            ...wsdata,
-          ]"
-          :key="index"
-        >
-          <svg-td>
-            vue组件递归
-            刚才写了篇《element多层导航菜单》文章,顺便也写写其中核心原理
-            其实没啥好说就是组件递归,这里呢简单写个例子,
-            面试被问到的时候直接拿来手写代
-          </svg-td>
-          <svg-td>
-            它不会报错,这个应该是被vue优化了。
-            思想:递归调用某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
-          </svg-td>
-          <svg-td>
-            它不会报错,这个应该是被vue优化了。
-            思想:递归调用某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
-          </svg-td>
-          <svg-td>
-            该是被vue优化了。
-            思想:递归调用某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
-          </svg-td>
-          <svg-td>
-            ue优化了。
-            思想:递归调用某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
-          </svg-td>
-          <svg-td>
-            某个组件,而这个组件的作用就是解析出此层的数据。因此数据的格式就有技巧:
-          </svg-td>
-          <svg-td> 数据的格式就有技巧: </svg-td>
-        </svg-tr>
+        <template v-for="(data, index) in new Array(39)">
+          <svg-tr v-if="index == 0" :key="index">
+            <svg-th
+              v-for="(item, index) in wstitle"
+              :key="index + '' + item.info"
+              :thData="item"
+            >
+              {{ item.info }}
+            </svg-th>
+          </svg-tr>
+          <svg-tr v-else :key="index">
+            <svg-td
+              v-for="(tdwidth, i) in tableWidther"
+              :key="thwidth + '' + i"
+              :defaultWidth="tdwidth"
+            >
+              {{ showData(index - 1, i) }}
+            </svg-td>
+          </svg-tr>
+        </template>
       </svg-table>
     </svg-paper>
   </div>
@@ -313,7 +283,7 @@ export default {
               index: 4,
             },
             {
-              info: "患者男性大段文字省略.......",
+              info: "患者男性大段文字省略患者男性大段文字省略患者男性大段文字省略患者男性大段文字省略患者男性大段文字省略患者男性大段文字省略",
               fzid: "2",
               tsys: "1",
               index: 9,
@@ -322,7 +292,7 @@ export default {
               info: "管XX",
               fzid: "3",
               tsys: "1",
-              index: 10,
+              index: 16,
             },
           ],
         },
@@ -403,7 +373,7 @@ export default {
               info: "管理员",
               fzid: "2",
               tsys: "1",
-              index: 10,
+              index: 16,
             },
           ],
         },
@@ -422,19 +392,19 @@ export default {
           son: [
             {
               info: "普通工具",
-              width: 30,
+              width: 35,
               height: 40,
               son: [],
             },
             {
               info: "疼痛评分",
-              width: 30,
+              width: 35,
               height: 40,
               son: [],
             },
             {
               info: "疼痛性质",
-              width: 30,
+              width: 35,
               height: 40,
               son: [],
             },
@@ -559,6 +529,26 @@ export default {
       LODOP.ADD_PRINT_HTM(0, 0, "100%", "100%", strHTML);
       LODOP.PREVIEW();
     },
+    blwz(titles = []) {
+      let r = [];
+      for (const iterator of titles) {
+        if (!iterator.son.length) {
+          r.push(iterator.width);
+        } else {
+          r = [...r, ...this.blwz(iterator.son)];
+        }
+      }
+      return r;
+    },
+    showData(index, i) {
+      let r = "";
+      if (this.wsdata[index] && this.wsdata[index].data) {
+        for (const iterator of this.wsdata[index].data) {
+          if (iterator.index == i + 1) r = iterator.info;
+        }
+      }
+      return r;
+    },
   },
   watch: {
     msg: {
@@ -575,6 +565,9 @@ export default {
     },
     shuju() {
       return this.msg.data;
+    },
+    tableWidther() {
+      return this.blwz(this.wstitle) || [];
     },
   },
 };

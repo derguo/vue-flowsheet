@@ -1,5 +1,5 @@
 <template>
-  <g :transform="`translate(${relativeXStr},${relativeYStr})`" width="320">
+  <g :transform="`translate(${relativeXStr},${relativeYStr})`">
     <defs>
       <clipPath :id.sync="thishash" class="clipPath1">
         <rect
@@ -10,7 +10,7 @@
         >
         </rect>
       </clipPath>
-      <path id="MyPath" :d="lineNum" fill="#fff" stroke="#000" />
+      <path :id="MyPath" :d="lineNum" fill="#fff" stroke="#000" />
     </defs>
     <rect
       :height="boxHeightStr"
@@ -35,7 +35,7 @@
       fill="#000000"
       :clip-path="`url(#${thishash})`"
     >
-      <textPath xlink:href="#MyPath">
+      <textPath :xlink:href="`#${MyPath}`">
         <slot></slot>
       </textPath>
     </text>
@@ -71,7 +71,7 @@ export default {
     },
     fontSize: {
       type: Number,
-      default: 10.5,
+      default: 9,
     },
   },
   data() {
@@ -82,12 +82,13 @@ export default {
       width: 0,
       height: 0,
       thishash:'',
+      MyPath:'',
     };
   },
   mounted() {
     this.textHeight = this.$refs.texth.getBoundingClientRect().height;
     this.thishash = this.onlyV();
-    console.log(this.thishash)
+    this.MyPath = this.onlyV();
   },
   updated() {},
   computed: {

@@ -29,7 +29,7 @@ export default {
   props: {
     size: {
       type: String || Array,
-      default: "a4",
+      default: "a4h",
     },
   },
   data() {
@@ -42,13 +42,17 @@ export default {
     size: {
       handler() {
         if (Array.isArray(this.size)) {
-            this.width = this.size[0];
-            this.height = this.size[1];
+          this.width = this.size[0];
+          this.height = this.size[1];
         } else {
           switch (this.size) {
             case "a4":
               this.width = 595;
               this.height = 842;
+              break;
+            case "a4h":
+              this.width = 942;
+              this.height = 595;
               break;
 
             default:
