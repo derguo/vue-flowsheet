@@ -69,13 +69,13 @@ export default {
     },
   },
   mounted(){
-    console.log("htData", this.thData,this.$refs.son);
+    // console.log("htData", this.thData,this.$refs.son);
     this.$refs.son.relativeY = this.thData.height;
   },
   watch: {
     thData: {
       handler() {
-        console.log("htData", this.thData,this.$refs.son);
+        // console.log("htData", this.thData,this.$refs.son);
         this.width = this.thData.width;
         this.height = this.thData.height;
       },

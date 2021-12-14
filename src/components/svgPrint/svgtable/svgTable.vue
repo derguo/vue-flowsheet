@@ -1,13 +1,15 @@
 <template>
-  <g :transform="`translate(0,0)`">
+  <g :transform="`translate(${relativeXStr},${relativeYStr})`">
     <slot name="header"></slot>
     <slot></slot>
   </g>
 </template>
 
 <script>
+import Box from "../mix/svgBox";
 export default {
   name: "svgTable",
+  mixins: [Box],
   mounted() {
     let rx = 0;
     let ry = 0;

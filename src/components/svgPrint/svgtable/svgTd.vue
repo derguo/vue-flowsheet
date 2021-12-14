@@ -125,7 +125,7 @@ export default {
       let tt = this.fontSize * 1.06;
 
       if (this.textHeight < this.height && this.textHeight != 0) {
-        console.log("计算", this.height, this.textHeight);
+        // console.log("计算", this.height, this.textHeight);
         tt += (this.height - this.textHeight) / 2;
       }
 

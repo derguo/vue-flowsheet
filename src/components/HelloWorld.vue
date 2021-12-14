@@ -12,6 +12,7 @@
       :defaultBlocks="defaultBlocks"
     ></flow-container> -->
     <svg-paper ref="table" :size="'a4h'">
+      <svg-title></svg-title>
       <svg-table>
         <template v-for="(data, index) in new Array(39)">
           <svg-tr v-if="index == 0" :key="index">
@@ -26,7 +27,7 @@
           <svg-tr v-else :key="index">
             <svg-td
               v-for="(tdwidth, i) in tableWidther"
-              :key="thwidth + '' + i"
+              :key="'td' + i"
               :defaultWidth="tdwidth"
             >
               {{ showData(index - 1, i) }}
@@ -41,12 +42,13 @@
 <script>
 import FlowContainer from "./flow/FlowContainer";
 import cloneDeep from "lodash/cloneDeep";
-import svgTable from "./svgtable/svgTable";
-import SvgTr from "./svgtable/svgTr";
-import svgThead from "./svgtable/svgThead";
-import svgTh from "./svgtable/svgTh";
-import svgTd from "./svgtable/svgTd";
-import svgPaper from "./svgPaper/svgPaper";
+import svgTable from "./svgPrint/svgtable/svgTable";
+import SvgTr from "./svgPrint/svgtable/svgTr";
+import svgThead from "./svgPrint/svgtable/svgThead";
+import svgTh from "./svgPrint/svgtable/svgTh";
+import svgTd from "./svgPrint/svgtable/svgTd";
+import svgPaper from "./svgPrint/svgPaper/svgPaper";
+import svgTitle from "./svgPrint/svgPaper/svgTitle"
 export default {
   name: "HelloWorld",
   props: {
@@ -60,9 +62,10 @@ export default {
     svgTh,
     svgTd,
     svgPaper,
+    svgTitle,
   },
   mounted() {
-    console.log(this.$slots);
+    // console.log(this.$slots);
   },
   data() {
     return {

@@ -1,18 +1,21 @@
 <template>
   <div
     :style="{
-      width: this.width + 'pt',
-      height: this.height + 'pt',
+      width: this.width + '' + this.unit,
+      height: this.height + '' + this.unit,
       boxShadow: '2px 2px 12px #ccc',
       margin: '0 auto',
       backgroundColor: '#fff',
     }"
   >
     <svg
+      ref="svg"
       :style="{
-        width: this.width + 'pt',
-        height: this.height + 'pt',
+        width: this.width + '' + this.unit,
+        height: this.height + '' + this.unit,
         backgroundColor: '#fff',
+        boxShadow: '2px 2px 12px #ccc',
+        margin: '0 auto',
       }"
     >
       <slot></slot>
@@ -21,11 +24,15 @@
 </template>
 
 <script>
+import svgTitle from "./svgTitle";
 export default {
   name: "svgPaper",
-  provide: {
-    unit: "pt",
+  provide() {
+    return {
+      unit: this.unit,
+    };
   },
+  components: { svgTitle },
   props: {
     size: {
       type: String || Array,
@@ -36,6 +43,7 @@ export default {
     return {
       width: 0,
       height: 0,
+      unit: "pt",
     };
   },
   watch: {
@@ -62,6 +70,21 @@ export default {
       },
       immediate: true,
     },
+  },
+  mounted() {
+    let tempheight = 0;
+    for (const iterator of this.$slots.default) {      
+      if (iterator.tag.indexOf("svgTitle") >= 0) {
+        iterator.componentInstance.relativeX = this.width / 2;
+        tempheight += iterator.componentInstance.height;
+      }
+
+      console.log(tempheight)
+
+      if (iterator.tag.indexOf("svgTable") >= 0) {
+        iterator.componentInstance.relativeY = tempheight;
+      }
+    }
   },
 };
 </script>
