@@ -1,22 +1,25 @@
 <template>
   <div id="app">
-    <HelloWorld :msg="msg">
+    <!-- <HelloWorld :msg="msg">
       <div>aa</div>
       <div>bbb</div>
       <component :is="aaa"></component>
       <test />
-    </HelloWorld>
+    </HelloWorld> -->
+    <svg-document></svg-document>
   </div>
 </template>
 
 <script>
 import HelloWorld from "./components/HelloWorld.vue";
+import svgDocument from "./components/svgDocument.vue"
 import Test from "./components/test.vue";
 
 export default {
   name: "app",
   components: {
-    HelloWorld
+    HelloWorld,
+    svgDocument
   },
   data() {
     return {

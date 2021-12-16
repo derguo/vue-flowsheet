@@ -29,6 +29,9 @@ export default {
     unit: {
       default: "pt",
     },
+    pushColumnWidths:{
+      default:() => {}
+    },
   },
   props: {
     thData: {
@@ -71,6 +74,10 @@ export default {
   mounted(){
     // console.log("htData", this.thData,this.$refs.son);
     this.$refs.son.relativeY = this.thData.height;
+    if(this.thData.son && !this.thData.son.length) {
+      this.pushColumnWidths(this.thData.width)
+    }
+    
   },
   watch: {
     thData: {

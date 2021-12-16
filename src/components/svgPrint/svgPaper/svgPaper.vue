@@ -30,6 +30,7 @@ export default {
   provide() {
     return {
       unit: this.unit,
+      fontSize: this.fontSize,
     };
   },
   components: { svgTitle },
@@ -38,12 +39,28 @@ export default {
       type: String || Array,
       default: "a4h",
     },
+    unit: {
+      type: String,
+      default: "pt",
+    },
+    fontSize: {
+      type: Number,
+      default: 9,
+    },
+    typesetting: {
+      type: Array,
+      default() {
+        return [
+          ["svgTitle", "svgHeader", "svgTable"],
+          ["svgFooter", "svgPager"],
+        ];
+      },
+    },
   },
   data() {
     return {
       width: 0,
       height: 0,
-      unit: "pt",
     };
   },
   watch: {
@@ -72,19 +89,54 @@ export default {
     },
   },
   mounted() {
-    let tempheight = 0;
-    for (const iterator of this.$slots.default) {      
-      if (iterator.tag.indexOf("svgTitle") >= 0) {
-        iterator.componentInstance.relativeX = this.width / 2;
-        tempheight += iterator.componentInstance.height;
+    this.$nextTick(() => {
+      let tempheight = 0;
+      // console.log('排版', this.$slots.default)
+      for (const type of this.typesetting[0]) {
+        for (const iterator of this.$slots.default) {
+          if (type == "svgTitle" && iterator.tag.indexOf("svgTitle") >= 0) {
+            iterator.componentInstance.relativeX = this.width / 2;
+            iterator.componentInstance.relativeY = tempheight;
+            tempheight += iterator.componentInstance.height;
+          }
+
+          if (type == "svgTable" && iterator.tag.indexOf("svgTable") >= 0) {
+            iterator.componentInstance.relativeY = tempheight;
+            tempheight += iterator.componentInstance.height;
+          }
+
+          if (type == "svgHeader" && iterator.tag.indexOf("svgHeader") >= 0) {
+            iterator.componentInstance.relativeY = tempheight;
+            tempheight += iterator.componentInstance.height;
+          }
+        }
       }
 
-      console.log(tempheight)
+      let bottomheight = 0;
+      for (let index = this.typesetting[1].length - 1; index >= 0; index--) {
+        const type = this.typesetting[1][index];
+        for (const iterator of this.$slots.default) {
+          if (type == "svgPager" && iterator.tag.indexOf("svgPager") >= 0) {
+            bottomheight += iterator.componentInstance.height;
+            iterator.componentInstance.relativeY = this.height - bottomheight;
+          }
 
-      if (iterator.tag.indexOf("svgTable") >= 0) {
-        iterator.componentInstance.relativeY = tempheight;
+          if (type == "svgFooter" && iterator.tag.indexOf("svgFooter") >= 0) {
+            bottomheight += iterator.componentInstance.height;
+            iterator.componentInstance.relativeY = this.height - bottomheight;
+          }
+        }
       }
-    }
+
+      for (const iterator of this.$slots.default) {
+        if (iterator.tag.indexOf("svgContent") >= 0) {
+          iterator.componentInstance.relativeY = tempheight;
+          iterator.componentInstance.width = this.width
+          iterator.componentInstance.height =
+            this.height - tempheight - bottomheight;
+        }
+      }
+    });
   },
 };
 </script>

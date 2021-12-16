@@ -1,23 +1,29 @@
 <template>
-  <g ref="title" :transform="`translate(${relativeXStr},${relativeYStr})`">
-    <text
+  <g ref="box" :transform="`translate(${relativeXStr},${relativeYStr})`">
+    <svg-text
+      ref="title"
       :font-size="fontSizeStr"
-      :transform="`translate(0,${textTransform})`"
-      style="font-weight: bolder;text-anchor:middle"
+      style="font-weight: bolder; text-anchor: middle"
     >
       {{ title }}
-    </text>
-    <text :font-size="subfontSizeStr" :transform="`translate(0,${subtextTransform})`" style=" text-anchor:middle">
+    </svg-text>
+    <svg-text
+      :font-size="subfontSizeStr"
+      style="text-anchor: middle"
+      :y="'27'"
+    >
       {{ subtitle }}
-    </text>
+    </svg-text>
   </g>
 </template>
 
 <script>
 import Box from "../mix/svgBox";
+import svgText from "./svgText"
 export default {
   name: "svgTitle",
   mixins: [Box],
+  components:{svgText},
   props: {
     title: {
       type: String,
@@ -36,6 +42,12 @@ export default {
       default: 9,
     },
   },
+  data() {
+    return {
+      titleHeight: 0,
+      subtitleHeight: 0,
+    };
+  },
   computed: {
     fontSizeStr() {
       return this.fontSize + "" + this.unit;
@@ -44,7 +56,7 @@ export default {
       return this.subfontSize + "" + this.unit;
     },
     textTransform() {
-      let tt = this.fontSize * 1.06;
+      let tt = (this.fontSize * 819) / 1000;
 
       if (this.unit == "pt") {
         tt = (tt * 4) / 3;
@@ -53,7 +65,8 @@ export default {
       return tt;
     },
     subtextTransform() {
-      let tt = (this.subfontSize + this.fontSize) * 1.06 + 5;
+      // let tt = this.fontSize + (this.subfontSize * 5) / 6;
+      let tt =  (this.subfontSize * 815) / 1000;
 
       if (this.unit == "pt") {
         tt = (tt * 4) / 3;
@@ -61,21 +74,7 @@ export default {
 
       return tt;
     },
-    boxHeightStr() {
-      if (!this.height) {
-        this.height = (this.fontSize * 132) / 100;
-      } else if (this.defaultHeight) {
-        this.height = this.defaultHeight;
-      }
-
-      return this.height + "" + this.unit;
-    },
   },
-  mounted() {
-    
-    this.height = this.$refs.title.getBoundingClientRect().height;
-    console.log( this.height)
-  }
 };
 </script>
 

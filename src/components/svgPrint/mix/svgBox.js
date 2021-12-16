@@ -46,6 +46,16 @@ const Box = {
             return r;
         },
     },
+    mounted() {
+        if (this.$refs.box) {
+            this.$nextTick(() => {
+                this.height = this.$refs.box.getBoundingClientRect().height;
+                if (this.unit == 'pt') {
+                    this.height = (3 / 4) * this.height
+                }
+            })
+        }
+    },
     watch: {
         defaultWidth: {
             handler() {
