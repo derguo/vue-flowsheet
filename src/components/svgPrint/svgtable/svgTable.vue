@@ -34,6 +34,7 @@ export default {
       cutLine: false,
       cutLineY: 0,
       columnWidths: [],
+      tabelH:0,
     };
   },
   created() {
@@ -53,10 +54,12 @@ export default {
     }
 
     this.height = ry;
+    this.tabelH = ry;
+    console.log('table高高高高高高高高高高高高高高高',this.height)
   },
   methods: {
     pushColumnWidths(width) {
-      console.log("列宽", width);
+      // console.log("列宽", width);
       this.columnWidths.push(width);
     },
   },

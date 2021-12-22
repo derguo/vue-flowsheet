@@ -102,7 +102,7 @@ export default {
 
           if (type == "svgTable" && iterator.tag.indexOf("svgTable") >= 0) {
             iterator.componentInstance.relativeY = tempheight;
-            tempheight += iterator.componentInstance.height;
+            tempheight += iterator.componentInstance.tabelH;
           }
 
           if (type == "svgHeader" && iterator.tag.indexOf("svgHeader") >= 0) {

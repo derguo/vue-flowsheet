@@ -65,6 +65,7 @@ const Box = {
         },
         defaultHeight: {
             handler() {
+                console.log('xxx',this.$options.name,this.defaultHeight)
                 this.height = this.defaultHeight;
             },
             immediate: true,
@@ -81,6 +82,12 @@ const Box = {
             },
             immediate: true,
         },
+        height:{
+            handler(v , o) {
+               console.log(this.$options.name,v , o)
+            },
+            immediate: true,
+        }
     },
 }
 

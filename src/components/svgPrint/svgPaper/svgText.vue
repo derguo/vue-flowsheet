@@ -21,19 +21,20 @@ export default {
   data() {
     return {
       size: 0,
+      width: 0,
     };
   },
   mounted() {
-      console.log('xxxxxxxxxx',this.fontSize, this.$refs.text.getAttribute("font-size"))
+    // console.log('xxxxxxxxxx',this.fontSize, this.$refs.text.getAttribute("font-size"))
     if (this.$refs.text.getAttribute("font-size")) {
       this.size = parseInt(
         this.$refs.text.getAttribute("font-size").replace(this.unit, "")
       );
     } else {
-        this.size = this.fontSize;
-        this.$refs.text.setAttribute("font-size",this.size + ''+ this.unit) ;
-      
+      this.size = this.fontSize;
+      this.$refs.text.setAttribute("font-size", this.size + "" + this.unit);
     }
+    this.width = this.$refs.text.getBoundingClientRect().width;
   },
   computed: {
     textTransform() {

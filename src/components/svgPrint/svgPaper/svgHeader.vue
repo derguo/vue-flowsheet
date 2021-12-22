@@ -1,6 +1,6 @@
 <template>
   <g ref="box" :transform="`translate(${relativeXStr},${relativeYStr})`">
-    <svg-text>页眉</svg-text>
+    <slot></slot>
   </g>
 </template>
 

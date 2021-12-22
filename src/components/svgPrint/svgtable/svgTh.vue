@@ -1,6 +1,6 @@
 <template>
   <g :transform="`translate(${relativeXStr},${relativeYStr})`">
-    <svg-td :defaultWidth="thData.width" :defaultHeight="thData.height">
+    <svg-td :defaultWidth="parseInt(thData.width)" :defaultHeight="parseInt(thData.height)">
       <slot></slot>
     </svg-td>
     <svg-tr ref="son">
@@ -73,9 +73,10 @@ export default {
   },
   mounted(){
     // console.log("htData", this.thData,this.$refs.son);
-    this.$refs.son.relativeY = this.thData.height;
+    this.$refs.son.relativeY = parseInt(this.thData.height);
     if(this.thData.son && !this.thData.son.length) {
-      this.pushColumnWidths(this.thData.width)
+      this.pushColumnWidths(parseInt(this.thData.width))
+      
     }
     
   },
@@ -83,8 +84,8 @@ export default {
     thData: {
       handler() {
         // console.log("htData", this.thData,this.$refs.son);
-        this.width = this.thData.width;
-        this.height = this.thData.height;
+        this.width = parseInt(this.thData.width);
+        this.height = parseInt(this.thData.height);
       },
       immediate: true,
     },
